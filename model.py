@@ -51,7 +51,7 @@ def evaluate(eval_model,epoch,criterion_high,criterion_low,data_source,dev='cpu'
             loss_high = criterion_high(high,targets[:,0])
             loss_low = criterion_low(low,targets[:,1])
             
-            score_h,score_l = compute_acc(output,targets)
+            score_h,score_l = compute_acc(high,low,targets)
             accs_h += score_h
             accs_l += score_l
             # accs += ((torch.argmax(output,dim=1)==targets).sum().item()/output.size(0))
