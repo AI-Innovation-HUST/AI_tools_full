@@ -71,7 +71,7 @@ def plot_diagram(e,data1,data2,label1,label2,label3):
 if __name__ == '__main__':
     data = []
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    train_dataset, val_dataset, test_dataset = load_data(csv_file='Dataset/data_1714496400000_1717174800000.csv')
+    train_dataset, val_dataset, test_dataset = load_data(csv_file='Dataset/BTC-USDT_2H_2024-05-01_00-00-00.0_2024-06-01_00-00-00.0.csv')
     train_loader = DataLoader(train_dataset, batch_size=512, shuffle=True, num_workers=1)
     val_loader = DataLoader(val_dataset, batch_size=512, shuffle=False, num_workers=1)
     test_loader = DataLoader(test_dataset, batch_size=512, shuffle=False, num_workers=1)
@@ -147,10 +147,10 @@ if __name__ == '__main__':
         print(epoch,"Loss: ",(cum_loss_h/count).item()," Valid_loss: ",eval_loss,"Valid high acc: ",acc_h,"valid low acc",acc_l)
         if len(val_loss)>0 and eval_loss < val_loss[-1]:
             val_loss.append(eval_loss)
-            torch.save(model,"results/evalModel_best.pth")
+            torch.save(model,"results/2H_best.pth")
         else:
             val_loss.append(eval_loss)
-            torch.save(model,"results/evalModel_best1.pth")
+            torch.save(model,"results/2H_best1.pth")
         # early_stop = early_stopping(train_ls,eval_loss)
         # if early_stop:
         #   torch.save(model,'best_model_{}.pth'.format(epoch+1))
