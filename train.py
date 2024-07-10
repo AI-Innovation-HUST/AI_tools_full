@@ -115,7 +115,7 @@ if __name__ == '__main__':
             low = low.view(-1,1)
             # print(output.shape)
             loss_high = criterion_high(high.float(),targets[:,0].float())
-            loss_low = criterion_low(low.float(),targets[:,1].float)
+            loss_low = criterion_low(low.float(),targets[:,1].float())
             total_loss = 0.5 * loss_high + 0.5 * loss_low
             train_l_high.append(loss_high.item())
             train_l_low.append(loss_low.item())
