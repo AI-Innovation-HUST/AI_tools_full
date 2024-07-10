@@ -80,8 +80,8 @@ if __name__ == '__main__':
     print("Test dataset size:", len(test_dataset))
     model = Transformer(n_blocks=4,d_model=16,n_heads=8,d_ff=256,dropout=0.5)
     model.to(dev)
-    criterion_high = nn.MSELoss(delta=0.5)
-    criterion_low = nn.MSELoss(delta=0.5)
+    criterion_high = nn.MSELoss()
+    criterion_low = nn.MSELoss()
     lr = 0.0001 # learning rate
     early_stopping = EarlyStopping(tolerance=5, min_delta=0.003)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
