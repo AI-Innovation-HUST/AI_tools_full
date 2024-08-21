@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load the provided Excel file
-file_path = 'results_1H copy.xlsx'
+file_path = 'Data_test/results_1H copy.xlsx'
 df = pd.read_excel(file_path)
 
 # Define constants
@@ -28,48 +28,51 @@ def execute_trades_with_cumulative_capital_and_stoploss(row, capital, accumulate
     prediction_low = row['prediction_l']
 
     trade_fee = trade_amount * trade_fee_percentage
-    trade_profit = []
-    # if prediction_low > open_price:
-        # Prediction is incorrect, no trade
-    #     return capital, trade_profit
-    # elif prediction_low < open_price < prediction_high:
+    profit = 0
+    
+    # Determine if the trade is long or short
     long_trade = (prediction_high - open_price) > (open_price - prediction_low)
+    
     if long_trade:
-        # Execute long trade
+        # Long trade logic
         take_profit_price = prediction_high
-        stoploss_price = open_price * (1 - stoploss_percentage / leverage) 
+        stoploss_price = open_price * (1 - stoploss_percentage / leverage)
+        
         if high_price >= take_profit_price:
-            profit = trade_amount * (1 - (take_profit_price / open_price)) * leverage - trade_fee
-        elif low_price <= stoploss_price:
-            profit = trade_amount * (1 - (stoploss_price / open_price)) * leverage - trade_fee
+            # Close with take profit
+            profit = (take_profit_price - open_price) * leverage * (trade_amount / open_price) - trade_fee
+        elif low_price < stoploss_price:
+            # Close with stoploss
+            profit = (stoploss_price - open_price) * leverage * (trade_amount / open_price) - trade_fee
         else:
-            profit = trade_amount * (1 - (close_price / open_price)) * leverage - trade_fee
-        # Execute short trade
+            # Close with closing price
+            profit = (close_price - open_price) * leverage * (trade_amount / open_price) - trade_fee
+
     else:
+        # Short trade logic
         take_profit_price = prediction_low
         stoploss_price = open_price * (1 + stoploss_percentage / leverage)
+        
         if low_price <= take_profit_price:
-            profit = trade_amount * (1 + (take_profit_price / open_price)) * leverage - trade_fee
-        elif high_price >= stoploss_price:
-            profit = trade_amount * (1 + (stoploss_price / open_price)) * leverage - trade_fee
+            # Close with take profit
+            profit = (open_price - take_profit_price) * leverage * (trade_amount / open_price) - trade_fee
+        elif high_price > stoploss_price:
+            # Close with stoploss
+            profit = (open_price - stoploss_price) * leverage * (trade_amount / open_price) - trade_fee
         else:
-            profit = trade_amount * (1 + (close_price / open_price)) * leverage - trade_fee
-            
-    trade_profit.append(profit)
+            # Close with closing price
+            profit = (open_price - close_price) * leverage * (trade_amount / open_price) - trade_fee
+
     capital += profit
+    accumulated_volume += trade_amount * leverage
 
-            
-    if trade_profit != []:
-        volume = trade_amount * leverage * 2
-        accumulated_volume += volume
-
-    return capital, trade_profit, accumulated_volume
+    return capital, profit, accumulated_volume
 
 # Iterate through each row to simulate trading
 for index, row in df.iterrows():
-    capital, trade_profit_percentage, accumulated_volume = execute_trades_with_cumulative_capital_and_stoploss(row, capital, accumulated_volume)
+    capital, trade_profit, accumulated_volume = execute_trades_with_cumulative_capital_and_stoploss(row, capital, accumulated_volume)
     results.append(capital)
-    profit_percentages.append(trade_profit_percentage)
+    profit_percentages.append(trade_profit)
     volumes.append(accumulated_volume)
 
 # Add the cumulative capital, trade profit percentages, and cumulative volume to the original dataframe
